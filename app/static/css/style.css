@@ -1,0 +1,102 @@
+/* Custom styles for the FastAPI application */
+
+/* General styling */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Sortable list styling */
+#sortable-list .list-group-item {
+    cursor: grab;
+    transition: background-color 0.2s;
+    position: relative;
+}
+
+#sortable-list .list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+.grabbing {
+    cursor: grabbing !important;
+}
+
+.sortable-ghost {
+    opacity: 0.4;
+    background-color: #c8e6c9 !important;
+}
+
+.sortable-chosen {
+    background-color: #e3f2fd;
+}
+
+.sortable-drag {
+    opacity: 0.8;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* HTMX indicator styling */
+.htmx-indicator {
+    display: none;
+    margin-left: 10px;
+}
+
+.htmx-request .htmx-indicator {
+    display: inline-block;
+}
+
+#result-area {
+    min-height: 50px;
+    border-radius: 4px;
+}
+
+/* Card styling */
+.card {
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: box-shadow 0.3s;
+}
+
+.card:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    font-weight: bold;
+    background-color: #f8f9fa;
+}
+
+/* Navigation styling */
+.navbar {
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.nav-link {
+    position: relative;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #0d6efd;
+    transition: width 0.3s;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+    }
+}

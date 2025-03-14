@@ -1,0 +1,66 @@
+<title>{% block title %} Dome - Login {% endblock %}</title>
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>Sign In To Your Account</h2>
+        
+        <form 
+            hx-post="/api/auth/login" 
+            hx-swap="outerHTML" 
+            hx-trigger="submit"
+            hx-indicator="#login-spinner"
+            _="on submit set #feedback.innerHTML to ''">
+        
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" 
+                        class="form-control" 
+                        id="email" 
+                        name="email" 
+                        required 
+                        autofocus
+                        _="on keyup if event.key == 'Enter' then go to next <input/>">
+            </div>
+            
+            <div class="mb-4">
+                <label for="password" class="form-label">Password</label>
+                <div class="input-group">
+                    <input type="password" 
+                            class="form-control" 
+                            id="password" 
+                            name="password" 
+                            required>
+                    <button class="btn btn-outline-secondary" 
+                            type="button" 
+                            _="on click if #password.type == 'password'
+                                        then set #password.type to 'text'
+                                        set the innerHTML of me to '<i>Hide</i>'
+                                        else
+                                        set #password.type to 'password'
+                                        set the innerHTML of me to '<i>Show</i>'">
+                        <i>Show</i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="remember" name="remember">
+                <label class="form-check-label" for="remember">
+                    Remember me
+                </label>
+            </div>
+            
+            <div id="feedback" class="alert alert-danger py-2 d-none" role="alert"></div>
+            
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    Sign In
+                    <span id="login-spinner" class="htmx-indicator spinner-border spinner-border-sm ms-2" role="status"></span>
+                </button>
+            </div>
+        </form>
+        <div id="error-message"></div>
+        <div class="auth-footer">
+            <p>Don't have an account? <a href="/register" hx-get="/register" hx-swap="innerHTML" hx-target="#auth-content" hx-push-url="true">Register</a></p>
+        </div>
+    </div>
+</div>
