@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container" id="main-content">
-{% if user %}
+
+{% if request.cookies.DomeToken %}
+<div class="container" id=main-content>
     yes logged
+</div>
 {% else %}
     <div id=auth-content hx-get="/login" hx-trigger="load" hx-swap="innerHTML"></div>
 {% endif %}
-</div>
+
 {% endblock  %}

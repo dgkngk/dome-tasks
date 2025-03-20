@@ -5,9 +5,9 @@
         
         <form 
             hx-post="/api/auth/register" 
-            hx-swap="innerHTML" 
+            hx-swap="innerHTML"
+            hx-target="#main-content"  
             hx-trigger="submit"
-            hx-target="#auth-container"
             hx-indicator="#login-spinner"
             _="on submit set #feedback.innerHTML to ''">
         

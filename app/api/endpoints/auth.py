@@ -1,5 +1,5 @@
 from typing import Annotated, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Form
+from fastapi import APIRouter, Depends, HTTPException, Request, status, Form
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import RedirectResponse
 from datetime import timedelta
@@ -25,12 +25,11 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     access_token = create_access_token(
         subject=user["id"], expires_delta=access_token_expires
     )
-    response = RedirectResponse("/main",status_code=status.HTTP_202_ACCEPTED)
+    response = RedirectResponse("/",status_code=status.HTTP_202_ACCEPTED)
     response.set_cookie(
-        key="Authorization", 
-        value=f"Bearer {access_token}",
-        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES, 
-        httponly=True, 
+        key="DomeToken", 
+        value=access_token,
+        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES,
         samesite="lax"
     )
     
@@ -73,9 +72,4 @@ async def register(
     )
     
     return {"message": "User created successfully", "user_id": user_id, "access_token": access_token, "token_type": "bearer"}
-
-@router.post("/logout")
-async def logout():
-    # @todo: remove
-    # In a stateless JWT setup, client-side needs to discard the token
-    return {"message": "Successfully logged out"}
+    

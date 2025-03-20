@@ -5,17 +5,18 @@
         
         <form 
             hx-post="/api/auth/login" 
-            hx-swap="outerHTML" 
+            hx-swap="innerHTML"
+            hx-target="#main-content"
             hx-trigger="submit"
             hx-indicator="#login-spinner"
             _="on submit set #feedback.innerHTML to ''">
         
             <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" 
+                <label for="username" class="form-label">Email</label>
+                <input  type="email" 
                         class="form-control" 
-                        id="email" 
-                        name="email" 
+                        id="username" 
+                        name="username" 
                         required 
                         autofocus
                         _="on keyup if event.key == 'Enter' then go to next <input/>">
