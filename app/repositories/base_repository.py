@@ -1,34 +1,55 @@
-from motor.motor_asyncio import AsyncIOMotorCollection
-from typing import List, TypeVar, Dict, Any
-from bson.objectid import ObjectId
-from app.db.database import get_database, connect_to_mongo
+from typing import Type, TypeVar, Generic, List, Optional, Dict, Any
+from pydantic import BaseModel
+from bson import ObjectId
+from app.db.database import db_connector
+from app.core.logger import dome_logger
 
-class BaseRepository:
-    DocumentType = TypeVar('DocumentType', Dict[str, Any], str)
-    def __init__(self, collection_name: str):
-        self.db = get_database()
-        self.collection: AsyncIOMotorCollection = self.db[collection_name]
-        
-    async def create(self, document_data: dict) -> str:
-        result = await self.collection.insert_one(document_data)
-        return str(result.inserted_id)
-    
-    async def find_by_id(self, user_id: str) -> dict:
-        return await self.collection.find_one({"_id": ObjectId(user_id)})
-    
-    async def find_all(self) -> List[DocumentType]:
-        cursor = self.collection.find()
-        documents = [document async for document in cursor]
-        return documents
-    
-    async def update(self, document_id: str, update_data: dict) -> bool:
-        result = await self.collection.update_one(
-            {"_id": ObjectId(document_id)},
-            {"$set": update_data}
-        )
-        return result.modified_count > 0
-    
-    async def delete(self, document_id: str) -> bool:
-        result = await self.collection.delete_one({"_id": ObjectId(document_id)})
-        return result.deleted_count > 0
+DocumentType = TypeVar('DocumentType', bound=BaseModel)
 
+class BaseRepository(Generic[DocumentType]):
+    def __init__(self, document_type: Type[DocumentType], collection_name: str):
+        if not db_connector.db:
+            raise RuntimeError("Database not connected. Call connect_to_mongo() first")
+            
+        self.document_type = document_type
+        self.collection_name = collection_name
+
+    async def create(self, entity: DocumentType) -> str:
+        document = entity.model_dump()
+        return await db_connector.create(self.collection_name, document)
+
+    async def find_by_id(self, entity_id: str) -> Optional[DocumentType]:
+        document = await db_connector.find(self.collection_name, entity_id)
+        return self._validate_document(document) if document else None
+
+    async def find_all(self, filters: Optional[Dict[str, Any]] = None) -> List[DocumentType]:
+        documents = await db_connector.find_all(self.collection_name, filters)
+        return [self._validate_document(doc) for doc in documents]
+
+    async def find_by_criteria(self, criteria: Dict[str, Any]) -> List[DocumentType]:
+        documents = await db_connector.find_all(self.collection_name, criteria)
+        return [self._validate_document(doc) for doc in documents]
+
+    async def update(self, entity_id: str, update_data: Dict[str, Any]) -> bool:
+        return await db_connector.update(self.collection_name, entity_id, update_data)
+
+    async def delete(self, entity_id: str) -> bool:
+        return await db_connector.delete(self.collection_name, entity_id)
+
+    def _validate_document(self, document: Dict[str, Any]) -> DocumentType:
+        try:
+            return self.document_type(**document)
+        except Exception as e:
+            dome_logger.error(f"Document validation failed for {self.collection_name}: {str(e)}")
+            raise ValueError(f"Invalid document structure for {self.document_type.__name__}") from e
+
+    def _apply_filters(self, filters: Dict[str, Any]) -> Dict[str, Any]:
+        if not filters:
+            return {}
+            
+        # Convert string IDs to ObjectId for MongoDB queries
+        if '_id' in filters:
+            filters['_id'] = ObjectId(filters['_id'])
+            
+        # Remove None values from filters
+        return {k: v for k, v in filters.items() if v is not None}
