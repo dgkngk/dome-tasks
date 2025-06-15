@@ -11,6 +11,12 @@ class Settings(BaseSettings):
     SECRET_KEY: str = secrets.token_urlsafe(32)
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8 days
     CRYPT_ALGO: str = "HS256"
+    SESSION_TTL: int = 86400  # 24 hours in seconds
+    
+    # Session storage settings
+    REDIS_HOST: str = "session_cache"
+    REDIS_PORT: int = 6379
+    REDIS_DB: int = 0
     
     # CORS
     CORS_ORIGINS: List[AnyHttpUrl] = []
